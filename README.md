@@ -1,7 +1,7 @@
 # CyongLibrary
-##三方通用组件整合库
+## 三方通用组件整合库
 
-1.动态权限申请工具类
+### 1.动态权限申请工具类
   (1)初始化工具类
   ```Java
     private ApplyPermissionUtil permissionUtil = null;//三方动态申请权限工具类
@@ -25,7 +25,6 @@
         }
     };
   ```
-  
   (3)在Activity或Fragment的onRequestPermissionsResult方法中让工具监听:
    ```Java
    @Override
@@ -34,7 +33,7 @@
        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
    }
    ```
-   (4)动态申请权限
+  (4)动态申请权限
    ```Java
    permissionUtil.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, TYPE_EXTERNAL_STORAGE);
    ```
