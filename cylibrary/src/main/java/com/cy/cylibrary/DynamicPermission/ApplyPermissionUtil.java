@@ -2,12 +2,14 @@ package com.cy.cylibrary.DynamicPermission;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import com.cy.cylibrary.utils.CLogger;
 
 /**
  * Created by cy on 2018/5/31.
@@ -40,9 +42,17 @@ public class ApplyPermissionUtil {
      */
     public static final int TYPE_EXTERNAL_STORAGE = 104;
 
-    private Context context = null;//Activity实例
-    private Fragment fragment = null;//Fragment实例
-    private int pageType = PAGE_TYPE_ACTIVITY;//标记请求动态权限的是Fragment还是Activity
+    /**
+     * 安装其他应用权限(Android8.0系统)
+     */
+    public static final int TYPE_REQUEST_INSTALL_PACKAGES = 105;
+
+    /** Activity实例 */
+    private Context context = null;
+    /** Fragment实例 */
+    private Fragment fragment = null;
+    /** 标记请求动态权限的是Fragment还是Activity */
+    private int pageType = PAGE_TYPE_ACTIVITY;
     private RequestPermissionsListener requestPermissionsListener = null;
 
     public ApplyPermissionUtil(Context context, RequestPermissionsListener requestPermissionsListener) {
@@ -66,6 +76,22 @@ public class ApplyPermissionUtil {
      */
     public void requestPermissions(String[] permissions, int requestCode) {
 
+        if(requestCode == TYPE_REQUEST_INSTALL_PACKAGES){
+            //适配Android8.0系统的未知安装应用权限
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                boolean b = context.getPackageManager().canRequestPackageInstalls();
+                if (b) {
+                    requestPermissionsListener.getRequestPermissionResult(true, requestCode);
+                    return;
+                } else {
+                    //未有安装未知应用的权限
+                }
+            } else {
+                requestPermissionsListener.getRequestPermissionResult(true, requestCode);
+                return;
+            }
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {// 判断Android版本是否大于23
             int checkCallPhonePermission = PackageManager.PERMISSION_GRANTED;
             boolean isGetAllPermission = true;
@@ -80,11 +106,10 @@ public class ApplyPermissionUtil {
 
                 if (pageType == PAGE_TYPE_FRAGMENT) {
                     fragment.requestPermissions(permissions, requestCode);//用Fragment的requestPermissions
-
                 } else if (pageType == PAGE_TYPE_ACTIVITY) {
                     ActivityCompat.requestPermissions((Activity) context, permissions, requestCode);//Activity下的请求动态权限method
                 } else {
-                    Log.e("", "requestPermission param pageType not define.");
+                    CLogger.e( "requestPermission param pageType not define.");
                 }
 
                 return;
@@ -98,19 +123,19 @@ public class ApplyPermissionUtil {
 
 
     /**
+     * 监听权限申请结果
      * 该方法必须定义在Activity或Fragment的onRequestPermissionsResult方法中
-     *
      * @param requestCode
      * @param permissions
      * @param grantResults
      */
     public void listenerRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestPermissionsListener == null) {
-            Log.e(TAG, "requestPermissionsListener is null.");
+            CLogger.e("requestPermissionsListener is null.");
             return;
         }
 
-        Log.d(TAG, "listenerRequestPermissionsResult： " + requestCode);
+        CLogger.d("listenerRequestPermissionsResult： " + requestCode);
         /**
          * 遇到的问题： 允许权限后，始终后无法在该Fragment获取回调 ， 拒绝则有
          *
@@ -125,7 +150,16 @@ public class ApplyPermissionUtil {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {//确定(获取权限成功)
                 requestPermissionsListener.getRequestPermissionResult(true, requestCode);
             } else {//拒绝
-                requestPermissionsListener.getRequestPermissionResult(false, requestCode);
+                if(requestCode == TYPE_REQUEST_INSTALL_PACKAGES){
+                    if(context != null){
+                        //Android8.0的系统需要引导用户至安装未知应用界面。
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
+                        ((Activity)context).startActivityForResult(intent, TYPE_REQUEST_INSTALL_PACKAGES);
+                    }
+                }else{
+                    requestPermissionsListener.getRequestPermissionResult(false, requestCode);
+                }
+
             }
         } else {
             requestPermissionsListener.getRequestPermissionResult(false, requestCode);
@@ -133,6 +167,28 @@ public class ApplyPermissionUtil {
 
     }
 
+    /**
+     * Android8.0监听是否有安装未知应用的的权限
+     * 该方法必须定义在Activity或Fragment的onActivityResult方法中
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    public void listenerInstallPackagePermissionResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == TYPE_REQUEST_INSTALL_PACKAGES){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                boolean b = context.getPackageManager().canRequestPackageInstalls();
+                if (b) {
+                    requestPermissionsListener.getRequestPermissionResult(true, requestCode);
+                } else {
+                    requestPermissionsListener.getRequestPermissionResult(false, requestCode);
+                }
+            } else {
+                requestPermissionsListener.getRequestPermissionResult(true, requestCode);
+            }
+
+        }
+    }
 
     public interface RequestPermissionsListener {
         /**
