@@ -44,7 +44,7 @@
     允许权限后，始终后无法在该Fragment获取回调 ， 拒绝则有<br>
     原因：由于该DialogFragment依附MainActivity的基类JYActivity，我们在JYActivity中重写了onRequestPermissionsResult,所以要在允许和拒绝后 调用super.onRequestPermissionsResult，这样Fragment的onRequestPermissionsResult才能有回调。<br>
 
-###适配Android8.0应用安装权限<br>
+### 适配Android8.0应用安装权限<br>
 1.首先在AndroidManifest.xml中配置<br>
 ```java
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
