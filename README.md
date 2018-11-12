@@ -43,20 +43,24 @@
     下面是我遇到的问题：<br>
     允许权限后，始终后无法在该Fragment获取回调 ， 拒绝则有<br>
     原因：由于该DialogFragment依附MainActivity的基类JYActivity，我们在JYActivity中重写了onRequestPermissionsResult,所以要在允许和拒绝后 调用super.onRequestPermissionsResult，这样Fragment的onRequestPermissionsResult才能有回调。<br>
-    
-```
+
 (5)适配Android8.0应用安装权限
   1.首先在AndroidManifest.xml中配置<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
   
   2.然后再申请权限的Activity中监听
+  ```java
       @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         permissionUtil.listenerInstallPackagePermissionResult(requestCode , resultCode , data);
     }
+ ```   
   3.请求安装应用权限
+  ```java
   permissionUtil.requestPermissions(new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES}, TYPE_REQUEST_INSTALL_PACKAGES);
+  ```
   4.在回调中处理自己的逻辑
+  ```java
   ApplyPermissionUtil.RequestPermissionsListener requestPermissionsListener = new ApplyPermissionUtil.RequestPermissionsListener() {
         @Override
         public void getRequestPermissionResult(boolean b, int i) {
@@ -80,5 +84,6 @@
             }
         }
     };
+    ```
     
 
