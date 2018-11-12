@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 26
@@ -35,10 +35,15 @@ dependencies {
     implementation 'io.reactivex:rxandroid:1.2.1'
     implementation 'io.reactivex:rxjava:1.1.6'
     implementation 'com.orhanobut:logger:1.15'
+//    implementation 'org.litepal.android:core:1.5.1'//轻量级数据库litepal
+//
+//    //paging
+//    implementation 'android.arch.paging:runtime:1.0.0'
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //noinspection GradleCompatible
     implementation 'com.android.support:support-v4:26.1.0'
-}
 
+}
 repositories {
     mavenCentral()
 }
