@@ -44,5 +44,41 @@
     允许权限后，始终后无法在该Fragment获取回调 ， 拒绝则有<br>
     原因：由于该DialogFragment依附MainActivity的基类JYActivity，我们在JYActivity中重写了onRequestPermissionsResult,所以要在允许和拒绝后 调用super.onRequestPermissionsResult，这样Fragment的onRequestPermissionsResult才能有回调。<br>
     
-    ---
+```
+(5)适配Android8.0应用安装权限
+  1.首先在AndroidManifest.xml中配置<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+  
+  2.然后再申请权限的Activity中监听
+      @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        permissionUtil.listenerInstallPackagePermissionResult(requestCode , resultCode , data);
+    }
+  3.请求安装应用权限
+  permissionUtil.requestPermissions(new String[]{Manifest.permission.REQUEST_INSTALL_PACKAGES}, TYPE_REQUEST_INSTALL_PACKAGES);
+  4.在回调中处理自己的逻辑
+  ApplyPermissionUtil.RequestPermissionsListener requestPermissionsListener = new ApplyPermissionUtil.RequestPermissionsListener() {
+        @Override
+        public void getRequestPermissionResult(boolean b, int i) {
+            switch (i) {
+                case TYPE_EXTERNAL_STORAGE:
+                    if (b) {
+                        Toast.makeText(MainActivity.this, "获取文件读取权限成功...", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "获取读写权限失败...", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                    break;
+                case TYPE_REQUEST_INSTALL_PACKAGES:
+                    if (b) {
+                        Toast.makeText(MainActivity.this, "获取安装应用权限成功...", Toast.LENGTH_LONG).show();
+                        installApk(installFile);//这是我自己处理的逻辑
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+    
 
