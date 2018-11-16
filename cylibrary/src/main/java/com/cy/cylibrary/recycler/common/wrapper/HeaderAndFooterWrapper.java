@@ -22,8 +22,10 @@ import com.cy.cylibrary.recycler.common.base.ViewHolder;
  * mHeaderAndFooterWrapper.addHeaderView(t2);
  *
  * mRecyclerView.setAdapter(mHeaderAndFooterWrapper);
- * mHeaderAndFooterWrapper.notifyDataSetChanged();
+ * mHeaderAndFooterWrapper.notifyDataSetChanged();//不能用mAdapter的notifyDataSetChanged
  * 类似装饰者模式，直接将原本的adapter传入，初始化一个HeaderAndFooterWrapper对象，然后调用相关API添加。
+ * 2018-11-16：在AddHeader后给Adapter设置的onItemClickListener会出现问题。
+ *
  */
 public class HeaderAndFooterWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
