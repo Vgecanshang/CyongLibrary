@@ -24,9 +24,10 @@ import butterknife.Unbinder;
 public class CBaseActivity extends AppCompatActivity {
 
     private Unbinder unbinder;
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setSystemBar();
     }
 
