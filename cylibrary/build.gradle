@@ -40,7 +40,8 @@ dependencies {
 //    androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'io.reactivex:rxandroid:1.2.1'
-    implementation 'io.reactivex:rxjava:1.1.6'
+//    implementation 'io.reactivex:rxjava:1.1.6'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation 'com.orhanobut:logger:1.15'
     implementation 'org.litepal.android:core:1.5.1'//轻量级数据库litepal
 
