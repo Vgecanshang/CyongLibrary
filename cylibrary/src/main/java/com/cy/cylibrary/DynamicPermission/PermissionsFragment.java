@@ -77,8 +77,11 @@ public class PermissionsFragment extends Fragment {
             }
 
             boolean granted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && permissions[i].equals(Manifest.permission.REQUEST_INSTALL_PACKAGES)) {
+                granted = getActivity().getPackageManager().canRequestPackageInstalls();
+            }
             if(!granted && permissions[i].equals(Manifest.permission.REQUEST_INSTALL_PACKAGES)){
-                //Android8.0的系统需要引导用户至安装未知应用界面。
+                //Android8.0的系统无安装权限需要跳转至安装未知应用界面。
                 Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
                 startActivityForResult(intent, TYPE_REQUEST_INSTALL_PACKAGES);
             }else{
